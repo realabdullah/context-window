@@ -20,3 +20,11 @@ export const COMPILE_TONE_OPTIONS = [
   'Internal Runbook',
   'Blog Post',
 ] as const;
+
+/** Human-readable labels for compile providers. Single source of truth for API and web apps. */
+export const COMPILE_PROVIDER_LABELS: Record<CompileProviderId, string> = {
+  anthropic: 'Claude (Anthropic)',
+  openai: 'GPT-4o (OpenAI)',
+  gemini: 'Gemini (Google)',
+  moonshot: 'Kimi (Moonshot) 200k',
+};
