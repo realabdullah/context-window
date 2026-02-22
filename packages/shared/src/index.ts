@@ -3,10 +3,19 @@ export { TRACE_STATUSES, LOG_TYPES, type TraceStatus, type LogType } from "./con
 export {
   COMPILE_PROVIDER_IDS,
   COMPILE_TONE_OPTIONS,
+  COMPILE_PROVIDER_LABELS,
   DEFAULT_COMPILE_PROVIDER,
   DEFAULT_COMPILE_TONE,
   type CompileProviderId,
 } from "./compile.js";
+export {
+  type Trace,
+  type Log,
+  type Article,
+  type CompileResponse,
+  type AuthSession,
+  type LoginResponse,
+} from "./api-types.js";
 export {
   createTraceSchema,
   updateTraceSchema,

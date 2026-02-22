@@ -1,4 +1,5 @@
 import {
+  COMPILE_PROVIDER_LABELS,
   DEFAULT_COMPILE_TONE,
   type CompileProviderId,
 } from '@context-window/shared';
@@ -85,11 +86,9 @@ export class CompileService {
   }
 
   getProviders(): { id: CompileProviderId; label: string }[] {
-    return [
-      { id: 'anthropic', label: 'Claude (Anthropic)' },
-      { id: 'openai', label: 'GPT-4o (OpenAI)' },
-      { id: 'gemini', label: 'Gemini (Google)' },
-      { id: 'moonshot', label: 'Kimi (Moonshot) 200k' },
-    ];
+    return (Object.keys(COMPILE_PROVIDER_LABELS) as CompileProviderId[]).map((id) => ({
+      id,
+      label: COMPILE_PROVIDER_LABELS[id],
+    }));
   }
 }
