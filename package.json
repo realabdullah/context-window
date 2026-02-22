@@ -1,0 +1,28 @@
+{
+  "name": "context-window-monorepo",
+  "private": true,
+  "packageManager": "pnpm@9.14.2",
+  "pnpm": {
+    "overrides": {
+      "@sindresorhus/merge-streams": "3.0.0"
+    }
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "db:generate": "dotenv -e .env -- pnpm --filter @context-window/database exec prisma generate",
+    "db:push": "dotenv -e .env -- pnpm --filter @context-window/database exec prisma db push",
+    "db:studio": "dotenv -e .env -- pnpm --filter @context-window/database exec prisma studio",
+    "db:migrate": "dotenv -e .env -- pnpm --filter @context-window/database exec prisma migrate dev",
+    "db:reset": "dotenv -e .env -- pnpm --filter @context-window/database exec prisma migrate reset"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^7.4.2",
+    "turbo": "^2.3.3"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

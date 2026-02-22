@@ -1,0 +1,79 @@
+// Context Window - Prisma Schema
+// PRD: User, Trace, Log, Article
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  githubId  String?   @unique
+  name      String?
+  avatarUrl String?
+  traces    Trace[]
+  sessions  Session[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  sessionToken String   @unique
+  expiresAt    DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Trace {
+  id        String      @id @default(cuid())
+  userId    String
+  title     String
+  status    TraceStatus @default(ACTIVE)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs      Log[]
+  article   Article?
+}
+
+model Log {
+  id        String   @id @default(cuid())
+  traceId   String
+  type      LogType
+  content   String
+  language  String?  // e.g. "typescript", "bash" for CODE/ERROR
+  isEdited  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  trace     Trace    @relation(fields: [traceId], references: [id], onDelete: Cascade)
+}
+
+model Article {
+  id              String   @id @default(cuid())
+  traceId         String   @unique
+  content         String
+  toneUsed        String?
+  aiProviderUsed  String   // e.g. 'gemini-2.5-flash', 'claude-3.5-sonnet'
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  trace           Trace    @relation(fields: [traceId], references: [id], onDelete: Cascade)
+}
+
+enum TraceStatus {
+  ACTIVE
+  COMPILED
+  ARCHIVED
+}
+
+enum LogType {
+  TEXT
+  CODE
+  ERROR
+  INSIGHT
+}

@@ -1,0 +1,14 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+  <defs>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#3B82F6" />
+    </linearGradient>
+  </defs>
+  <!-- Container -->
+  <rect x="10" y="10" width="80" height="80" rx="16" fill="#0D1117" stroke="#21262D" stroke-width="4" />
+  <!-- C & W formed by a continuous glowing trace line -->
+  <path
+    d="M 65 30 L 40 30 C 32 30 28 34 28 42 L 28 58 C 28 66 32 70 40 70 L 45 70 L 52.5 50 L 60 70 L 65 70 L 72.5 50 L 80 70"
+    stroke="url(#grad2)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

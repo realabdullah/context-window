@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* IDE-like dark theme (PRD: dark-mode, monospace) */
+    --cw-bg: #0d1117;
+    --cw-fg: #e6edf3;
+    --cw-muted: #8b949e;
+    --cw-border: #30363d;
+    --cw-accent: #58a6ff;
+    --cw-accent-dim: #388bfd;
+    --cw-success: #3fb950;
+    --cw-error: #f85149;
+    --cw-code-bg: #161b22;
+  }
+}
