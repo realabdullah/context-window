@@ -1,26 +1,28 @@
 import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
 import type { User } from '@context-window/database';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';
 import { SessionGuard } from './session.guard';
+import { GithubAuthGuard } from './github-auth.guard';
 import { SESSION_COOKIE_NAME, SESSION_MAX_AGE_MS } from './auth.constants';
-
-const FRONTEND_URL = process.env.FRONTEND_URL ?? 'http://localhost:3000';
+import {
+  defaultRedirectOrigin,
+  isAllowedOrigin,
+} from './auth-redirect.config';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get('github')
-  @UseGuards(AuthGuard('github'))
+  @UseGuards(GithubAuthGuard)
   github() {
-    // Passport redirects to GitHub
+    // Passport redirects to GitHub; state = client origin from Referer
   }
 
   @Get('github/callback')
-  @UseGuards(AuthGuard('github'))
+  @UseGuards(GithubAuthGuard)
   async githubCallback(@Req() req: Request & { user: User }, @Res() res: Response) {
     const user = req.user;
     const { sessionToken, expiresAt } = await this.authService.createSession(user.id);
@@ -31,7 +33,9 @@ export class AuthController {
       maxAge: SESSION_MAX_AGE_MS,
       path: '/',
     });
-    res.redirect(`${FRONTEND_URL}/traces`);
+    const state = typeof req.query.state === 'string' ? req.query.state : '';
+    const redirectOrigin = isAllowedOrigin(state) ? state : defaultRedirectOrigin;
+    res.redirect(`${redirectOrigin}/traces`);
   }
 
   @Get('me')
