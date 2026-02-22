@@ -71,8 +71,14 @@ export async function fetchAuthMe(): Promise<AuthUser | null> {
   return res.json();
 }
 
+/** Use for navigation only (e.g. <a href>). Do not fetch this URL — use full page navigation to avoid CORS. */
 export function getAuthLoginUrl(): string {
-  return `${getBaseUrl()}/auth/github`;
+  const base = `${getBaseUrl()}/auth/github`;
+  if (typeof window !== 'undefined') {
+    const state = encodeURIComponent(window.location.origin);
+    return `${base}?state=${state}`;
+  }
+  return base;
 }
 
 export async function fetchLogout(): Promise<void> {

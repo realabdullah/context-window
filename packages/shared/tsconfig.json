@@ -6,8 +6,9 @@
     "noEmit": false,
     "declaration": true,
     "declarationMap": true,
-    "module": "CommonJS",
-    "moduleResolution": "Node"
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": []
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

@@ -1,7 +1,8 @@
 /**
  * Allowed frontend origins for CORS and post-login redirect.
- * Each app (Next.js, Vite) has its own env key; we detect which client
- * initiated login via Referer and redirect back there.
+ * Set these in production so the API allows your deployed app origin
+ * (e.g. VITE_APP_URL=https://cwn.abdspace.xyz for the Vite app).
+ * Login flow uses ?state=origin or Referer to choose redirect after OAuth.
  */
 const NEXTJS_APP_URL = process.env.NEXTJS_APP_URL ?? 'http://localhost:3000';
 const VITE_APP_URL = process.env.VITE_APP_URL ?? 'http://localhost:3002';
