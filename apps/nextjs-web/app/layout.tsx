@@ -1,33 +1,38 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Syne, Source_Sans_3, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { AuthProvider } from '@/lib/auth-context'
 import { CommandPalette } from '@/components/command-palette'
+import { CreateTraceDialogProvider } from '@/components/create-trace-dialog'
+import { QueryProvider } from '@/components/query-provider'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const syne = Syne({
+  subsets: ['latin'],
+  variable: '--font-display-var',
+  display: 'swap',
+})
+const sourceSans = Source_Sans_3({
+  subsets: ['latin'],
+  variable: '--font-sans-var',
+  display: 'swap',
+})
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono-var',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: 'Context Window | Developer AI Tool',
-  description: 'Build better AI by understanding your context window usage',
-  generator: 'v0.app',
+  title: 'Context Window | AI-Powered Ghostwriter for Technical Thoughts',
+  description: 'The asynchronous ghostwriter for your technical thoughts. Log breadcrumbs as you build, hit Compile, and get a structured technical draft from your preferred AI.',
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
+        url: '/favicon.svg',
         type: 'image/svg+xml',
       },
     ],
-    apple: '/apple-icon.png',
   },
 }
 
@@ -37,12 +42,20 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${syne.variable} ${sourceSans.variable} ${jetbrainsMono.variable}`}
+    >
       <body className="font-sans antialiased bg-background text-foreground">
-        <AuthProvider>
-          <CommandPalette />
-          {children}
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <CreateTraceDialogProvider>
+              <CommandPalette />
+              {children}
+            </CreateTraceDialogProvider>
+          </AuthProvider>
+        </QueryProvider>
         <Analytics />
       </body>
     </html>

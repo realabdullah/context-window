@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-github2';
-import type { User } from '@context-window/database';
-import { AuthService, type GitHubProfile } from './auth.service';
+import type { User } from '@context-window/shared'
+import { Injectable } from '@nestjs/common'
+import { PassportStrategy } from '@nestjs/passport'
+import { Strategy } from 'passport-github2'
+import { AuthService, type GitHubProfile } from './auth.service'
 
 interface GitHubProfileRaw {
   id: string;

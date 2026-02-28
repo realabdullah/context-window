@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import type { User } from '@context-window/database';
-import { CurrentUser } from '../auth/current-user.decorator';
-import { SessionGuard } from '../auth/session.guard';
-import { LogService } from './log.service';
+import type { User } from '@context-window/shared'
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common'
+import { CurrentUser } from '../auth/current-user.decorator'
+import { SessionGuard } from '../auth/session.guard'
+import { LogService } from './log.service'
 
 @Controller('traces/:traceId/logs')
 @UseGuards(SessionGuard)

@@ -1,4 +1,12 @@
-import type { Log } from '@context-window/database';
+import type { LogType } from '@context-window/shared'
+
+/** Log-like shape accepted by buildUserMessage (Prisma returns Date, shared Log uses string). */
+type LogEntry = {
+  type: LogType;
+  content: string;
+  language: string | null;
+  createdAt: Date | string;
+};
 
 /**
  * Generates the dynamic system prompt for the LLM Compilation step.
@@ -23,11 +31,13 @@ RULES:
 6. Strict Output: Output ONLY the article body in Markdown. Do NOT include an abstract, meta-commentary about the logs, a preamble, or a "Here is the article" wrapper.`;
 }
 
-export function buildUserMessage(logs: Pick<Log, 'type' | 'content' | 'language' | 'createdAt'>[]): string {
+export function buildUserMessage(logs: LogEntry[]): string {
   const lines = logs.map((log, i) => {
     const meta = [log.type, log.language].filter(Boolean).join(' ');
     const header = meta ? `[${meta}]` : `[${log.type}]`;
-    return `--- Entry ${i + 1} (${log.createdAt.toISOString()}) ${header} ---\n${log.content}`;
+    const createdAt =
+      log.createdAt instanceof Date ? log.createdAt.toISOString() : new Date(log.createdAt).toISOString();
+    return `--- Entry ${i + 1} (${createdAt}) ${header} ---\n${log.content}`;
   });
   return `Breadcrumbs (chronological):\n\n${lines.join('\n\n')}`;
 }

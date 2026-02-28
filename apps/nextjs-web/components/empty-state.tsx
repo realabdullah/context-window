@@ -20,13 +20,13 @@ export function EmptyState({
   children,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed border-border rounded-lg">
-      {icon && <div className="text-foreground/40 mb-4 text-4xl">{icon}</div>}
-      <h3 className="text-foreground/60 text-sm font-semibold text-center mb-1">
+    <div className="flex flex-col items-center justify-center py-16 px-6 border border-dashed border-border/60 rounded-xl bg-card/30 animate-in fade-in duration-300">
+      {icon && <div className="text-muted-foreground mb-4 text-4xl">{icon}</div>}
+      <h3 className="font-display font-semibold text-foreground text-sm text-center mb-2">
         {title}
       </h3>
       {description && (
-        <p className="text-foreground/40 text-xs text-center mb-4 max-w-xs">
+        <p className="text-muted-foreground text-sm text-center mb-6 max-w-sm leading-relaxed">
           {description}
         </p>
       )}
