@@ -44,6 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [refetch]);
 
   const login = useCallback(() => {
+    // Full navigation only — never fetch(); CORS blocks fetch to OAuth redirects
     window.location.href = getAuthLoginUrl();
   }, []);
 
