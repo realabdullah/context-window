@@ -8,17 +8,12 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
-import { useEffect, useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { apiClient } from '@/lib/api-client'
 import { useAuth } from '@/lib/auth-context'
-import {
-  Home,
-  Plus,
-  LogOut,
-  Search,
-  FileText,
-  Zap,
-} from 'lucide-react'
+import { useCreateTraceDialog } from '@/components/create-trace-dialog'
+import { FileText, Home, LogOut, Plus, Zap } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 interface Command {
   id: string
@@ -33,9 +28,37 @@ interface Command {
 export function CommandPalette() {
   const [open, setOpen] = useState(false)
   const [commands, setCommands] = useState<Command[]>([])
+  const [traceStatus, setTraceStatus] = useState<string | null>(null)
   const router = useRouter()
   const pathname = usePathname()
   const { isAuthenticated, logout } = useAuth()
+  const createTraceDialog = useCreateTraceDialog()
+
+  // When on a trace detail page (not compile), fetch trace to know if we can show Compile command
+  useEffect(() => {
+    if (!isAuthenticated || !pathname?.includes('/traces/') || pathname?.endsWith('/compile')) {
+      setTraceStatus(null)
+      return
+    }
+    const segments = pathname.split('/').filter(Boolean)
+    const traceId = segments[segments.length - 1]
+    if (!traceId) {
+      setTraceStatus(null)
+      return
+    }
+    let cancelled = false
+    apiClient.getTrace(traceId).then(
+      (trace) => {
+        if (!cancelled) setTraceStatus(trace.status ?? null)
+      },
+      () => {
+        if (!cancelled) setTraceStatus(null)
+      }
+    )
+    return () => {
+      cancelled = true
+    }
+  }, [isAuthenticated, pathname])
 
   // Register keyboard shortcut
   useEffect(() => {
@@ -72,34 +95,39 @@ export function CommandPalette() {
         {
           id: 'new-trace',
           title: 'Create New Trace',
-          description: 'Start a new trace',
+          description: 'New workspace for a task or feature',
           icon: <Plus className="w-4 h-4" />,
           onSelect: () => {
-            router.push('/app')
+            createTraceDialog?.setOpen(true)
             setOpen(false)
           },
           group: 'Actions',
-          shortcut: '⌘N',
+          shortcut: '⌘⌥E',
         }
       )
 
-      // Trace-specific commands
+      // Trace-specific commands (Compile only when trace is not already COMPILED)
       if (pathname.includes('/traces/')) {
-        const traceId = pathname.split('/').pop()
-        newCommands.push(
-          {
-            id: 'compile',
-            title: 'Compile Trace',
-            description: 'Generate article from logs',
-            icon: <Zap className="w-4 h-4" />,
-            onSelect: () => {
-              router.push(`/app/traces/${traceId}/compile`)
-              setOpen(false)
-            },
-            group: 'Trace',
-            shortcut: '⌘⇧C',
-          },
-          {
+        const segments = pathname.split('/').filter(Boolean)
+        const isCompilePage = pathname.endsWith('/compile')
+        const traceId = isCompilePage ? segments[segments.length - 2] : segments[segments.length - 1]
+        if (traceId && !isCompilePage) {
+          if (traceStatus !== 'COMPILED') {
+            newCommands.push({
+              id: 'compile',
+              title: 'Compile Trace',
+              description: 'Feed logs to AI, get structured article',
+              icon: <Zap className="w-4 h-4" />,
+              onSelect: () => {
+                router.push(`/app/traces/${traceId}/compile`)
+                setOpen(false)
+              },
+              group: 'Trace',
+              shortcut: '⌘⇧C',
+            })
+          }
+        } else if (traceId && isCompilePage) {
+          newCommands.push({
             id: 'view-logs',
             title: 'View Logs',
             description: 'Back to trace',
@@ -109,8 +137,8 @@ export function CommandPalette() {
               setOpen(false)
             },
             group: 'Trace',
-          }
-        )
+          })
+        }
       }
 
       // Auth commands
@@ -141,7 +169,7 @@ export function CommandPalette() {
     }
 
     setCommands(newCommands)
-  }, [isAuthenticated, pathname, router])
+  }, [isAuthenticated, pathname, router, traceStatus])
 
   // Group commands by category
   const groupedCommands = commands.reduce(
@@ -195,8 +223,8 @@ export function CommandPalette() {
           </CommandGroup>
         ))}
       </CommandList>
-      <div className="border-t border-border p-2 text-xs text-foreground/50">
-        <p>Press <kbd className="px-2 py-1 bg-card rounded border border-border">⌘K</kbd> to open</p>
+      <div className="border-t border-border/60 p-2 text-xs text-muted-foreground">
+        <p>Press <kbd className="px-2 py-1 bg-muted rounded border border-border font-mono">⌘K</kbd> to open</p>
       </div>
     </CommandDialog>
   )

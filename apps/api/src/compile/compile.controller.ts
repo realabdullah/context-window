@@ -1,14 +1,14 @@
+import type { User } from '@context-window/shared'
 import {
   COMPILE_PROVIDER_IDS,
   DEFAULT_COMPILE_PROVIDER,
   DEFAULT_COMPILE_TONE,
   type CompileProviderId,
-} from '@context-window/shared';
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import type { User } from '@context-window/database';
-import { CurrentUser } from '../auth/current-user.decorator';
-import { SessionGuard } from '../auth/session.guard';
-import { CompileService } from './compile.service.js';
+} from '@context-window/shared'
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
+import { CurrentUser } from '../auth/current-user.decorator'
+import { SessionGuard } from '../auth/session.guard'
+import { CompileService } from './compile.service.js'
 
 @Controller('traces')
 @UseGuards(SessionGuard)

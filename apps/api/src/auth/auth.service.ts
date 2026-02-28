@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { randomBytes } from 'crypto';
-import type { PrismaClient } from '@context-window/database';
-import { PrismaService } from '../prisma/prisma.service';
-import { SESSION_MAX_AGE_MS } from './auth.constants';
+import type { PrismaClient } from '@context-window/database'
+import { Injectable } from '@nestjs/common'
+import { randomBytes } from 'crypto'
+import { PrismaService } from '../prisma/prisma.service'
+import { SESSION_MAX_AGE_MS } from './auth.constants'
 
 export type GitHubProfile = {
   id: string;

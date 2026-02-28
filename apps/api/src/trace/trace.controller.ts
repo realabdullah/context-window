@@ -1,9 +1,8 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import type { TraceStatus } from '@context-window/shared';
-import { CurrentUser } from '../auth/current-user.decorator';
-import { SessionGuard } from '../auth/session.guard';
-import type { User } from '@context-window/database';
-import { TraceService } from './trace.service';
+import type { TraceStatus, User } from '@context-window/shared'
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
+import { CurrentUser } from '../auth/current-user.decorator'
+import { SessionGuard } from '../auth/session.guard'
+import { TraceService } from './trace.service'
 
 @Controller('traces')
 @UseGuards(SessionGuard)

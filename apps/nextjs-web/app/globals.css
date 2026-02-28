@@ -5,46 +5,56 @@
 
 :root {
   color-scheme: dark;
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.18 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.18 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.56 0.212 262.51);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.56 0.212 262.51);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.5 0.15 25);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.25 0 0);
-  --input: oklch(0.20 0 0);
-  --ring: oklch(0.56 0.212 262.51);
-  --chart-1: oklch(0.56 0.212 262.51);
-  --chart-2: oklch(0.55 0.15 139.77);
-  --chart-3: oklch(0.55 0.15 39.74);
-  --chart-4: oklch(0.65 0.15 29.23);
-  --chart-5: oklch(0.50 0.15 54.3);
+  /* Motion tokens – ease-out-quart for natural deceleration */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  /* Warm-tinted dark palette (hue 75 = amber) – avoids generic purple-on-dark */
+  --background: oklch(0.12 0.015 75);
+  --foreground: oklch(0.96 0.01 75);
+  --card: oklch(0.16 0.015 75);
+  --card-foreground: oklch(0.96 0.01 75);
+  --popover: oklch(0.16 0.015 75);
+  --popover-foreground: oklch(0.96 0.01 75);
+  --primary: oklch(0.72 0.16 75);
+  --primary-foreground: oklch(0.15 0.02 75);
+  --secondary: oklch(0.22 0.02 75);
+  --secondary-foreground: oklch(0.96 0.01 75);
+  --muted: oklch(0.22 0.02 75);
+  --muted-foreground: oklch(0.65 0.02 75);
+  --accent: oklch(0.72 0.16 75);
+  --accent-foreground: oklch(0.15 0.02 75);
+  --destructive: oklch(0.55 0.18 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.24 0.02 75);
+  --input: oklch(0.20 0.02 75);
+  --ring: oklch(0.72 0.16 75);
+  --chart-1: oklch(0.72 0.16 75);
+  --chart-2: oklch(0.65 0.12 160);
+  --chart-3: oklch(0.68 0.14 35);
+  --chart-4: oklch(0.62 0.15 280);
+  --chart-5: oklch(0.58 0.12 200);
   --radius: 0.5rem;
-  --sidebar: oklch(0.15 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.56 0.212 262.51);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.25 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.25 0 0);
-  --sidebar-ring: oklch(0.56 0.212 262.51);
+  --sidebar: oklch(0.14 0.015 75);
+  --sidebar-foreground: oklch(0.96 0.01 75);
+  --sidebar-primary: oklch(0.72 0.16 75);
+  --sidebar-primary-foreground: oklch(0.15 0.02 75);
+  --sidebar-accent: oklch(0.22 0.02 75);
+  --sidebar-accent-foreground: oklch(0.96 0.01 75);
+  --sidebar-border: oklch(0.24 0.02 75);
+  --sidebar-ring: oklch(0.72 0.16 75);
 }
 
 
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --font-sans: var(--font-sans-var), 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-var), 'JetBrains Mono', ui-monospace, monospace;
+  --font-display: var(--font-display-var), 'Syne', var(--font-sans);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -90,6 +100,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  .font-display {
+    font-family: var(--font-display);
+  }
   
   /* Focus visible states for keyboard navigation */
   button:focus-visible,
@@ -106,14 +119,54 @@
     clip-path: inset(50%);
   }
   
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
+  /* Smooth scrolling (respect reduced motion) */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
   
-  /* Better contrast for text selection */
+  /* Better contrast for text selection (warm amber tint) */
   ::selection {
-    background-color: rgb(88, 166, 255, 0.3);
+    background-color: oklch(0.72 0.16 75 / 0.35);
     color: inherit;
+  }
+}
+
+/* Article markdown preview (compiled trace) */
+.article-preview h1,
+.article-preview h2,
+.article-preview h3 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+.article-preview h1:first-child,
+.article-preview h2:first-child,
+.article-preview h3:first-child {
+  margin-top: 0;
+}
+.article-preview p {
+  margin-bottom: 0.75em;
+}
+.article-preview pre {
+  margin: 0.75em 0;
+}
+.article-preview ul,
+.article-preview ol {
+  margin-bottom: 0.75em;
+}
+
+/* Reduced motion – accessibility (vestibular disorders) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  /* Preserve functional feedback – loading spinner still rotates */
+  [class*='animate-spin'] {
+    animation-duration: 1s !important;
   }
 }

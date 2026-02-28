@@ -1,7 +1,10 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { apiClient } from '@/lib/api-client'
+import { traceKeys } from '@/lib/queries'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/lib/auth-context'
 import type { Article, Log, Trace } from '@/lib/types'
 import {
@@ -31,13 +34,6 @@ export default function CompilePage() {
   const [compiled, setCompiled] = useState<Article | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/')
-    }
-  }, [isAuthenticated, isLoading, router])
-
   // Load trace
   useEffect(() => {
     if (!isAuthenticated || isLoading || !traceId) return
@@ -58,12 +54,22 @@ export default function CompilePage() {
     loadTrace()
   }, [isAuthenticated, isLoading, traceId])
 
+  // When trace is already COMPILED, show read-only view on trace detail; redirect to avoid duplicate compile UI
+  useEffect(() => {
+    if (trace && trace.status === 'COMPILED') {
+      router.replace(`/app/traces/${traceId}`)
+    }
+  }, [trace, traceId, router])
+
+  const queryClient = useQueryClient()
   const handleCompile = async () => {
     setIsCompiling(true)
     setError(null)
     try {
-      const response = await apiClient.compileTrace(traceId, provider, tone)
-      setCompiled(response.article)
+      await apiClient.compileTrace(traceId, provider, tone)
+      queryClient.invalidateQueries({ queryKey: traceKeys.detail(traceId) })
+      queryClient.invalidateQueries({ queryKey: traceKeys.lists() })
+      router.replace(`/app/traces/${traceId}`)
     } catch (err) {
       console.error('Failed to compile:', err)
       setError(err instanceof Error ? err.message : 'Failed to compile trace')
@@ -90,16 +96,46 @@ export default function CompilePage() {
 
   if (isLoading || isLoadingTrace) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-foreground/60">Loading...</div>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="flex items-center gap-4 mb-6">
+          <Skeleton className="h-9 w-24" />
+          <Skeleton className="h-8 w-40" />
+        </div>
+        <div className="grid md:grid-cols-2 gap-8 min-h-[60vh]">
+          <div className="border border-border/60 rounded-xl p-6 bg-card/30 space-y-4">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-48" />
+            <div className="border-t border-border pt-4 space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-3 w-28" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="border border-border/60 rounded-xl p-6 bg-card/30 space-y-4">
+            <Skeleton className="h-5 w-28" />
+            <div className="space-y-2">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="h-4 w-full" />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
 
   if (!trace) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-foreground/60">Trace not found</div>
+      <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col items-center justify-center gap-4 min-h-[40vh]">
+        <p className="text-muted-foreground">Trace not found</p>
+        <Link href="/app">
+          <Button variant="outline" size="sm">Back to dashboard</Button>
+        </Link>
       </div>
     )
   }
@@ -121,26 +157,21 @@ export default function CompilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border px-6 py-4 sticky top-0 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link href={`/app/traces/${traceId}`}>
-              <Button variant="ghost" size="sm" className="gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </Button>
-            </Link>
-            <h1 className="text-xl font-semibold text-foreground">Compile Trace</h1>
-          </div>
-        </div>
-      </header>
+    <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="flex items-center gap-4 mb-6">
+        <Link href={`/app/traces/${traceId}`}>
+          <Button variant="ghost" size="sm" className="gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Button>
+        </Link>
+        <h1 className="font-display text-xl font-semibold text-foreground">Compile Trace</h1>
+      </div>
 
       {/* Split-Screen View (PRD: Left = Source of Truth, Right = Article) */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <div>
         {/* Compile controls: target format + provider + button */}
-        <div className="flex flex-wrap items-center gap-4 mb-6 p-4 border border-border rounded-lg bg-card/30">
+        <div className="flex flex-wrap items-center gap-4 mb-6 p-4 border border-border/60 rounded-xl bg-card/30">
           <div className="flex items-center gap-2">
             <span className="text-sm text-foreground/70 font-mono">Target format:</span>
             <select
@@ -177,8 +208,8 @@ export default function CompilePage() {
 
         <div className="grid md:grid-cols-2 gap-8 min-h-[60vh]">
           {/* Left Pane: Read-only timeline (Source of Truth) */}
-          <div className="border border-border rounded-lg p-6 bg-card/30 overflow-y-auto max-h-[70vh]">
-            <h2 className="text-sm font-semibold text-foreground mb-4 font-mono">Source of Truth</h2>
+          <div className="border border-border/60 rounded-xl p-6 bg-card/30 overflow-y-auto max-h-[70vh]">
+            <h2 className="font-display text-sm font-semibold text-foreground mb-4 font-mono">Source of Truth</h2>
             <div className="space-y-2 mb-4">
               <p className="text-foreground font-mono font-medium">{trace.title}</p>
               <p className="text-xs text-foreground/40">
@@ -208,8 +239,8 @@ export default function CompilePage() {
           </div>
 
           {/* Right Pane: LLM-generated Article (Output) */}
-          <div className="border border-border rounded-lg p-6 bg-card/30 overflow-y-auto max-h-[70vh]">
-            <h2 className="text-sm font-semibold text-foreground mb-4 font-mono">Article (Output)</h2>
+          <div className="border border-border/60 rounded-xl p-6 bg-card/30 overflow-y-auto max-h-[70vh]">
+            <h2 className="font-display text-sm font-semibold text-foreground mb-4 font-mono">Article (Output)</h2>
             {compiled ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-xs text-foreground/50">
@@ -232,14 +263,26 @@ export default function CompilePage() {
                   </Button>
                 </div>
               </div>
+            ) : isCompiling ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-xs text-foreground/50">
+                  <span className="inline-block w-2 h-2 rounded-full bg-accent animate-pulse" />
+                  Compiling...
+                </div>
+                <div className="space-y-2">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <Skeleton key={i} className="h-4 w-full" />
+                  ))}
+                </div>
+              </div>
             ) : (
               <div className="text-center py-12 text-foreground/50">
-                <p className="text-sm font-mono">Compile to generate the article</p>
+                <p className="text-sm font-mono">Hit Compile to feed your logs to the AI and generate the article</p>
               </div>
             )}
           </div>
         </div>
-      </main>
+      </div>
     </div>
   )
 }

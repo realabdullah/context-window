@@ -1,15 +1,15 @@
-import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
-import type { Request, Response } from 'express';
-import type { User } from '@context-window/database';
-import { AuthService } from './auth.service';
-import { CurrentUser } from './current-user.decorator';
-import { SessionGuard } from './session.guard';
-import { GithubAuthGuard } from './github-auth.guard';
-import { SESSION_COOKIE_NAME, SESSION_MAX_AGE_MS } from './auth.constants';
+import type { User } from '@context-window/shared'
+import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common'
+import type { Request, Response } from 'express'
 import {
   defaultRedirectOrigin,
   isAllowedOrigin,
-} from './auth-redirect.config';
+} from './auth-redirect.config'
+import { SESSION_COOKIE_NAME, SESSION_MAX_AGE_MS } from './auth.constants'
+import { AuthService } from './auth.service'
+import { CurrentUser } from './current-user.decorator'
+import { GithubAuthGuard } from './github-auth.guard'
+import { SessionGuard } from './session.guard'
 
 @Controller('auth')
 export class AuthController {
