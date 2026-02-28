@@ -1,17 +1,20 @@
 /**
  * Allowed frontend origins for CORS and post-login redirect.
- * Each app (Next.js, Vite) has its own env key; we detect which client
- * initiated login via Referer and redirect back there.
  */
 const NEXTJS_APP_URL = process.env.NEXTJS_APP_URL ?? 'http://localhost:3000';
 const VITE_APP_URL = process.env.VITE_APP_URL ?? 'http://localhost:3002';
 
-export const allowedOrigins: string[] = [NEXTJS_APP_URL, VITE_APP_URL].filter(
-  (u) => u.length > 0,
-);
+const extraOrigins = (process.env.ALLOWED_ORIGINS ?? '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter((o) => o.length > 0);
+
+export const allowedOrigins: string[] = [
+  ...new Set([NEXTJS_APP_URL, VITE_APP_URL, ...extraOrigins].filter((u) => u.length > 0)),
+];
 
 export const defaultRedirectOrigin =
-  NEXTJS_APP_URL || VITE_APP_URL || 'http://localhost:3000';
+  NEXTJS_APP_URL || VITE_APP_URL || extraOrigins[0] || 'http://localhost:3000';
 
 export function getAllowedOrigins(): string[] {
   return [...allowedOrigins];
