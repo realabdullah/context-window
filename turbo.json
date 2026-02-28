@@ -5,7 +5,7 @@
     "SESSION_SECRET",
     "NEXTJS_APP_URL","VITE_APP_URL",
     "VITE_API_URL",
-    "MOONSHOT_API_KEY"
+    "MOONSHOT_API_KEY","ALLOWED_ORIGINS"
   ],
   "tasks": {
     "build": {
